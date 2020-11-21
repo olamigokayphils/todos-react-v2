@@ -20,9 +20,10 @@ export default function MainBoard() {
         }
     ])
 
-    function deleteActivity(index){
-        let controlData = [...activityList]
-        controlData.splice(index, 1)
+    const [formValue, setFormValue] = useState("")
+
+    function deleteActivity(id){
+        let controlData = activityList.filter((item) => item.id !== id )
         setActivityList(controlData)
     }
 
@@ -32,21 +33,36 @@ export default function MainBoard() {
         setActivityList(controlData)
     }
 
+    function HandleSubmit(){
+        if(!formValue) return alert("Empty form Value")
+        //
+        const newestID = activityList.length
+        let updatedTask = [...activityList]
+        updatedTask.push({
+            id: newestID,
+            task: formValue,
+            completed: false
+        })
+        setActivityList(updatedTask)
+        // Reset Form
+        setFormValue("")
+    }
+
     return (
         <div className="main-board">
             {/** Activity Board */}
-            <form className="activity-form">
-                <input className="form-input" placeholder="Enter Activity" />
+            <form onSubmit={(event)=> { event.preventDefault(); HandleSubmit()}} className="activity-form">
+                <input value={formValue} onChange={(event)=> setFormValue(event.target.value)} className="form-input" placeholder="Enter Activity" />
                 <button type="submit" className="form-button">Add</button>
             </form>
             {/**  End Activity Form */}
 
       {/** Activity List */}
-      <h3 className="activity-list-title">My Activities <small className="task-count">(3 of 3 Tasks completed)</small></h3>
+      <h3 className="activity-list-title">My Activities <small className="task-count">({activityList.filter((item)=> item.completed).length} of {activityList.length} Tasks completed)</small></h3>
       {activityList.map((item, index) => {
           return (
               <div key={index}>
-          <Activity activity={item} completeTask={completeTask} deleteActivity={deleteActivity} />
+          <Activity activity={item} index={index} completeTask={completeTask} deleteActivity={deleteActivity} />
           </div>
           )
       })}
